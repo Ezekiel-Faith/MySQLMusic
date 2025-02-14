@@ -21,7 +21,10 @@ public class Main {
 		final char[] password = (okCxl == JOptionPane.OK_OPTION) ? pf.getPassword() : null;
 
 		var dataSource = new MysqlDataSource();
-		dataSource.setUrl(CONN_STRING);
+		//dataSource.setUrl(CONN_STRING);
+		dataSource.setServerName("localhost");
+		dataSource.setPort(3306);
+		dataSource.setDatabaseName("music");
 
 		//try(Connection connection = DriverManager.getConnection(CONN_STRING, username,
 		//		String.valueOf(password))) {
