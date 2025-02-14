@@ -1,5 +1,8 @@
 package dev.lpa;
 
+import com.mysql.cj.jdbc.MysqlDataSource;
+
+import javax.sql.DataSource;
 import javax.swing.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,8 +20,12 @@ public class Main {
 				"Enter DP Password", JOptionPane.OK_CANCEL_OPTION);
 		final char[] password = (okCxl == JOptionPane.OK_OPTION) ? pf.getPassword() : null;
 
-		try(Connection connection = DriverManager.getConnection(CONN_STRING, username,
-				String.valueOf(password))) {
+		var dataSource = new MysqlDataSource();
+		dataSource.setUrl(CONN_STRING);
+
+		//try(Connection connection = DriverManager.getConnection(CONN_STRING, username,
+		//		String.valueOf(password))) {
+		try(Connection connection = dataSource.getConnection(username, String.valueOf(password))){
 			System.out.println("Success!!! Connection made to the music database");
 			Arrays.fill(password, ' ');
 		} catch (SQLException e) {
