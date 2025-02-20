@@ -27,11 +27,21 @@ public class Main {
 		dataSource.setPort(Integer.parseInt(props.getProperty("port")));
 		dataSource.setDatabaseName(props.getProperty("databaseName"));
 
-		Scanner sc = new Scanner(System.in);
-		System.out.print("Enter an Album Name: ");
-		String albumName = sc.nextLine();
-		String query = "SELECT * FROM music.albumview WHERE album_name='%s'"
-				.formatted(albumName);
+		try {
+			dataSource.setMaxRows(10);
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		String query = "SELECT * FROM music.artists limit 10";
+
+//		String query = """
+//				WITH RankedRows AS (
+//									SELECT *,
+//									ROW_NUMBER() OVER (ORDER BY artist_id) AS row_num
+//									from music.artists
+//									)
+//									SELECT * FROM RankedRows WHERE row_num <= 10
+//				""";
 
 		try (var connection = dataSource.getConnection(
 				props.getProperty("user"),
@@ -41,29 +51,20 @@ public class Main {
 			ResultSet resultSet = statement.executeQuery(query);
 
 			var meta = resultSet.getMetaData();
-//			for (int i = 1; i <= meta.getColumnCount(); i++) {
-//				System.out.printf("%d %s %s %n", i,
-//						meta.getColumnName(i),
-//						meta.getColumnTypeName(i));
-//			}
 
 			System.out.println("-".repeat(20));
 
-			for(int i=1; i <= meta.getColumnCount(); i++){
+			for (int i = 1; i <= meta.getColumnCount(); i++) {
 				System.out.printf("%-15s", meta.getColumnName(i).toUpperCase());
 			}
 
 			System.out.println();
 
 			while (resultSet.next()) {
-				for(int i = 1; i <= meta.getColumnCount(); i++) {
+				for (int i = 1; i <= meta.getColumnCount(); i++) {
 					System.out.printf("%-15s", resultSet.getString(i));
 				}
 				System.out.println();
-//				System.out.printf("%d %s %s %n",
-//						resultSet.getInt("album_id"),
-//						resultSet.getString("album_name"),
-//						resultSet.getString("artist_id"));
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
